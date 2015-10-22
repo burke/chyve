@@ -1,0 +1,1 @@
+# hosts.allow   This file describes the names of the hosts which are allowed access by the '/usr/local/bin/tcpd' server.

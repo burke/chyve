@@ -25,4 +25,6 @@ sudo gsed -i '/^\t\tclear/d' initrd/root/.profile
 # important purpose otherwise.
 sudo cp -R files/* initrd/
 
+mkdir initrd/src
+
 ( cd initrd ; find . | sudo cpio -o -H newc ) | gzip -c > initrd.gz

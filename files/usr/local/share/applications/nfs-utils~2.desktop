@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=restart_nfs-client
+Exec= sudo /usr/local/etc/init.d/nfs-client restart 
+Categories=Utility

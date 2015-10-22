@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=start_nfs-server
+Exec= sudo /usr/local/etc/init.d/nfs-server start 
+Categories=Utility

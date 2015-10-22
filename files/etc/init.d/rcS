@@ -13,6 +13,34 @@
 
 /usr/local/bin/cgroupfs-mount
 
+# don't want/need console messages
 echo 0 > /proc/sys/kernel/printk
 
 /etc/init.d/tc-config > /dev/null
+
+/usr/local/sbin/rpcbind
+
+try_mount() {
+  mount 192.168.64.1:/Users/burke/src/github.com/shopify/shopify /src 2>/dev/null
+}
+
+count=0
+while [ 1 ]; do
+  if try_mount; then
+    break
+  else
+    if [ $count -lt 2 ]; then
+      :
+    elif [ $count -eq 2 ]; then
+      >&2 echo -n "waiting for network..."
+    elif [ $count -eq 30 ]; then
+      >&2 echo -en "\n\x1b[31mnetwork didn't come up in time: aborting.\x1b[0m"
+      halt -f
+    else
+      >&2 echo -n "."
+    fi
+    count=$(expr $count + 1)
+    sleep 0.5
+  fi
+done
+

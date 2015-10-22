@@ -4,7 +4,7 @@ DIR="{{DIR}}"
 
 KERNEL="$DIR/vmlinuz"
 INITRD="$DIR/initrd.gz"
-CMDLINE="earlyprintk=serial console=ttyS0 acpi=off quiet"
+CMDLINE="earlyprintk=serial console=ttyS0 acpi=off quiet tce=rootfs"
 
 sudo xhyve \
   -m 1G \

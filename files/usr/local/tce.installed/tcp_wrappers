@@ -1,0 +1,3 @@
+#!/bin/sh
+[ -e /etc/hosts.allow ] || cp -p /usr/local/etc/hosts.allow /etc/
+[ -e /etc/hosts.deny ] || cp -p /usr/local/etc/hosts.deny /etc/

@@ -1,0 +1,59 @@
+#!/bin/sh
+# 
+#
+case "$1" in
+start)
+	if [ ! -d /proc/fs/nfsd ]; then
+ 	KERNEL=`uname -r`;
+ 	echo "filesystems-$KERNEL is not installed";
+	exit 1;
+	fi
+	if [ -z "`lsmod | grep "^nfsd "`" 2> /dev/null ]; then
+    		modprobe nfsd
+  	fi
+
+	if grep nfsd /proc/filesystems 2> /dev/null; then
+      		if [ -z "`grep nfsd /proc/mounts`" 2> /dev/null ]; then
+        		mount -t nfsd nfsd /proc/fs/nfs 2> /dev/null
+      		fi
+    	fi
+	
+	if [ -x /usr/local/sbin/rpc.mountd ] && [ -x /usr/local/sbin/rpc.nfsd ]; then
+		start-stop-daemon --start --exec /usr/local/sbin/rpcbind
+		start-stop-daemon --start --exec /usr/local/sbin/rpc.statd
+		/usr/local/sbin/exportfs -a 2> /dev/null
+		start-stop-daemon --start --exec /usr/local/sbin/rpc.mountd 
+		[ $(pidof nfsd) ] || /usr/local/sbin/rpc.nfsd 8 2> /dev/null
+		
+		echo "nfs-server utilities are started."
+	else
+		echo "You do not have nfs-utils installed. Install nfs-utils."
+	fi
+;;
+
+stop)
+	killall -9 nfsd
+	start-stop-daemon --stop --exec /usr/local/sbin/rpc.mountd
+	rmmod nfsd
+	rmmod exportfs
+;;
+
+restart)
+  	$0 stop
+  	$0 start
+;;
+
+status)
+	if ps | awk '{print $3}' | grep -e "/usr/local/sbin/rpc.statd" >/dev/null && ps | awk '{print $3}' | grep -e "/usr/local/sbin/rpc.statd" >/dev/null && ps | awk '{print $3}' | grep -e "\[nfsd\]" >/dev/null; then 
+		echo "NFS-server is running."
+		exit 0
+	else
+		echo "NFS-server is not running."
+		exit 1
+	fi
+;;		
+
+*)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac

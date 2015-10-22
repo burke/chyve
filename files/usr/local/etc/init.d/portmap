@@ -1,0 +1,40 @@
+#!/bin/sh
+# 
+# Starts and stops portmap.
+
+
+case "$1" in
+start)
+
+	if [ -x /usr/local/sbin/portmap ]; then
+		start-stop-daemon --start --exec /usr/local/sbin/portmap
+	else
+		echo "Portmap is not installed.  You need to install the portmap extension."
+	fi	
+
+;;
+
+stop)
+	start-stop-daemon --stop --exec /usr/local/sbin/portmap && echo "Portmap stopped."
+;;
+
+restart)
+  	$0 stop
+  	$0 start
+;;
+
+status)
+	if ps | awk '{print $3}' | grep -e "/usr/local/sbin/portmap" >/dev/null; then
+		echo "Portmap is running."
+		exit 0
+	else
+		echo "Portmap is not running."
+		exit 1
+	fi
+		
+;; 
+
+*)
+        echo "Usage: $0 {start|stop|restart|status}"
+esac
+

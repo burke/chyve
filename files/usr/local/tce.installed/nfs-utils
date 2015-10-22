@@ -1,0 +1,17 @@
+#!/bin/sh
+
+[ -d /var/lib/nfs/sm ] || mkdir -p /var/lib/nfs/sm
+
+[ -d /var/lib/nfs/sm.bak ] || mkdir -p /var/lib/nfs/sm.bak
+
+[ -f /var/lib/nfs/etab ] || touch /var/lib/nfs/etab
+
+[ -f /var/lib/nfs/rmtab ] || touch /var/lib/nfs/rmtab
+
+[ -f /var/lib/nfs/xtab ] || touch /var/lib/nfs/xtab
+
+[ -f /var/lib/nfs/state ] || touch /var/lib/nfs/state
+
+[ -f /usr/local/etc/exports ] || cp -p /usr/local/share/nfs-utils/files/exports /usr/local/etc/
+
+ln -sf /usr/local/sbin/mount.nfs /sbin/

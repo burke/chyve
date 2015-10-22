@@ -1,0 +1,1 @@
+# hosts.deny   This file describes the names of the hosts which are denied access by the '/usr/local/bin/tcpd' server.

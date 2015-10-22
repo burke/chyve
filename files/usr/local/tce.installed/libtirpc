@@ -1,0 +1,5 @@
+#!/bin/sh
+
+if [ ! -f /etc/netconfig ]; then
+  cp -p /usr/local/share/libtirpc/files/netconfig /etc
+fi
