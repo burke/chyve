@@ -17,6 +17,12 @@ sudo ln -s ../lib/ld-linux-x86-64.so.2 initrd/lib64/ld-linux-x86-64.so.2
 sudo gsed -i '13 a\
 /usr/local/bin/cgroupfs-mount' initrd/etc/init.d/rcS
 
+sudo gsed -i '/^clear/d' initrd/etc/init.d/tc-config
+sudo gsed -i '/^\t\tclear/d' initrd/root/.profile
+
+# note sbin/autologin is replaced to log in as tc instead of root. This is
+# mostly to suppress a console message about a root login and has no real
+# important purpose otherwise.
 sudo cp -R files/* initrd/
 
 ( cd initrd ; find . | sudo cpio -o -H newc ) | gzip -c > initrd.gz
