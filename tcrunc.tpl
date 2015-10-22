@@ -1,31 +1,41 @@
 #!/bin/bash
 # vim: ft=sh
+DIR="{{DIR}}" # templated by installer
 
-uid="$(id -u)"
-if [[ ${uid} -eq 0 ]]; then
-  >&2 echo "don't use root"
-  exit 1
-fi
+mkdir -p "/tmp/tcrunc-exports"
 
-DIR="{{DIR}}"
-
-KERNEL="$DIR/vmlinuz"
-INITRD="$DIR/initrd.gz"
-CMDLINE="earlyprintk=serial console=ttyS0 acpi=off quiet tce=rootfs nfsexport=$(pwd)"
+SRCDIR="$(pwd)"
 
 setup_nfs() {
-  echo "$(pwd) -network 192.168.64.0 -mask 255.255.255.0 -alldirs -mapall=${uid}:20" \
+  echo "${SRCDIR} -network 192.168.64.0 -mask 255.255.255.0 -alldirs -mapall=${UID}:20" \
     | sudo tee -a /etc/exports >/dev/null
   sudo nfsd update
 }
 
-setup_nfs
+teardown_nfs() {
+  sudo sed -i '' "/${SRCDIR//\//\\/}/d" /etc/exports
+  sudo nfsd update
+  rmdir /tmp/tcrunc-exports 2>/dev/null
+}
 
-sudo xhyve \
-  -m 1G \
-  -s 0:0,hostbridge \
-  -s 2:0,virtio-net \
-  -s 31,lpc \
-  -l com1,stdio \
-  -f kexec,$KERNEL,$INITRD,"$CMDLINE"
+main() {
+  if [[ "${UID}" -eq 0 ]]; then
+    >&2 echo "don't use root"
+    exit 1
+  fi
 
+  setup_nfs
+  trap teardown_nfs EXIT
+
+  local kernel="${DIR}/vmlinuz"
+  local initrd="${DIR}/initrd.gz"
+  local cmdline="earlyprintk=serial console=ttyS0 acpi=off quiet tce=rootfs nfsexport=${SRCDIR}"
+  sudo xhyve \
+    -m 1G \
+    -s 0:0,hostbridge \
+    -s 2:0,virtio-net \
+    -s 31,lpc \
+    -l com1,stdio \
+    -f kexec,${kernel},${initrd},"${cmdline}"
+}
+main "$@"
