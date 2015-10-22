@@ -1,0 +1,22 @@
+#!/bin/bash
+
+sudo rm -rf initrd
+trap 'sudo rm -rf initrd' EXIT
+mkdir initrd
+( cd initrd ; cat ../initrd.unpatched.gz | zcat | sudo cpio -idm )
+
+sudo gsed -i '/^# ttyS0$/s#^..##' initrd/etc/securetty
+sudo gsed -i '/^tty1:/s#tty1#ttyS0#g' initrd/etc/inittab
+sudo gsed -i '/^tc:/s#sh#run-sh-then-poweroff#' initrd/etc/passwd
+
+sudo rm initrd/etc/motd
+
+sudo mkdir initrd/lib64
+sudo ln -s ../lib/ld-linux-x86-64.so.2 initrd/lib64/ld-linux-x86-64.so.2
+
+sudo gsed -i '13 a\
+/usr/local/bin/cgroupfs-mount' initrd/etc/init.d/rcS
+
+sudo cp -R files/* initrd/
+
+( cd initrd ; find . | sudo cpio -o -H newc ) | gzip -c > initrd.gz
