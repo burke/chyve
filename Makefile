@@ -1,8 +1,8 @@
 include config.mk
 
-SHARE=${PREFIX}/share/tcrunc
+SHARE=${PREFIX}/share/chyve
 
-all: initrd.gz tcrunc
+all: initrd.gz chyve
 
 initrd.gz: FORCE
 	@echo building patched initrd.gz
@@ -10,20 +10,20 @@ initrd.gz: FORCE
 	@echo you also must first brew install gnu-sed.
 	@./build-patched-initrd
 
-tcrunc: tcrunc.tpl
+chyve: chyve.tpl
 	@echo creating $@ from $<
 	@sed 's#{{DIR}}#${SHARE}#g' < $< > $@
 	@chmod a+x $@
 
 clean:
 	@echo cleaning
-	@rm -f tcrunc initrd.gz
+	@rm -f chyve initrd.gz
 	@rm -rf initrd
 
 install: all
 	@echo installing executable file to ${PREFIX}/bin
 	@mkdir -p ${PREFIX}/bin
-	@cp -f tcrunc ${PREFIX}/bin/tcrunc
+	@cp -f chyve ${PREFIX}/bin/chyve
 	@echo installing support files to ${SHARE}
 	@mkdir -p ${SHARE}
 	@cp -f vmlinuz ${SHARE}/vmlinuz
@@ -31,7 +31,7 @@ install: all
 
 uninstall:
 	@echo removing executable file from ${PREFIX}/bin
-	@rm -f ${PREFIX}/bin/tcrunc
+	@rm -f ${PREFIX}/bin/chyve
 	@echo removing ${SHARE}
 	@rm -f ${SHARE}/vmlinuz
 	@rm -f ${SHARE}/initrd.gz

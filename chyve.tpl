@@ -2,7 +2,7 @@
 # vim: ft=sh
 DIR="{{DIR}}" # templated by installer
 
-mkdir -p "/tmp/tcrunc-exports"
+mkdir -p "/tmp/chyve-exports"
 
 SRCDIR="$(pwd)"
 
@@ -15,7 +15,7 @@ setup_nfs() {
 teardown_nfs() {
   sudo sed -i '' "/${SRCDIR//\//\\/}/d" /etc/exports
   sudo nfsd update
-  rmdir /tmp/tcrunc-exports 2>/dev/null
+  rmdir /tmp/chyve-exports 2>/dev/null
 }
 
 main() {
