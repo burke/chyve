@@ -21,7 +21,13 @@ echo 0 > /proc/sys/kernel/printk
 /usr/local/sbin/rpcbind
 
 try_mount() {
-  mount 192.168.64.1:/Users/burke/src/github.com/shopify/shopify /src 2>/dev/null
+  local exp="$(awk 'BEGIN { FS="="; RS=" " } $1 == "nfsexport" { print $2 }' < /proc/cmdline)"
+  if [ -n "${exp}" ]; then
+    mount -t nfs "192.168.64.1:${exp}" /src 2>/dev/null
+  else
+    # no cmdline for mount, so just don't mount anything.
+    true
+  fi
 }
 
 count=0
